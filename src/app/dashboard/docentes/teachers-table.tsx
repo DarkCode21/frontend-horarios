@@ -30,7 +30,7 @@ const teachers = [
     status: "Contratado",
     courses: 2,
     date: "18 sep, 2015",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "2",
@@ -40,7 +40,7 @@ const teachers = [
     status: "Contratado",
     courses: 1,
     date: "18 mar, 2019",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "3",
@@ -50,7 +50,7 @@ const teachers = [
     status: "Contratado",
     courses: 0,
     date: "8 ene, 2025",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "4",
@@ -60,7 +60,7 @@ const teachers = [
     status: "Contratado",
     courses: 2,
     date: "18 sep, 2015",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "5",
@@ -70,7 +70,7 @@ const teachers = [
     status: "Contratado",
     courses: 1,
     date: "18 mar, 2019",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "6",
@@ -80,7 +80,7 @@ const teachers = [
     status: "Contratado",
     courses: 0,
     date: "8 ene, 2025",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
 ];
 

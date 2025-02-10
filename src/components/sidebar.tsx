@@ -43,7 +43,7 @@ export function Sidebar({ className }: SidebarProps) {
               className="w-full justify-start text-slate-500"
               asChild
             >
-              <Link href="#">
+              <Link href="/dashboard/horarios">
                 <Clock className="mr-2 h-4 w-4" />
                 Horarios
               </Link>

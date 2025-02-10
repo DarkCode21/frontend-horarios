@@ -31,7 +31,7 @@ const users = [
     role: "User",
     status: "Activo",
     date: "18 sep, 2015",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "2",
@@ -41,7 +41,7 @@ const users = [
     role: "User",
     status: "Inactivo",
     date: "18 mar, 2019",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "3",
@@ -51,7 +51,7 @@ const users = [
     role: "User",
     status: "Activo",
     date: "8 ene, 2025",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "4",
@@ -61,7 +61,7 @@ const users = [
     role: "Docente",
     status: "Activo",
     date: "18 sep, 2015",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "5",
@@ -71,7 +71,7 @@ const users = [
     role: "Docente",
     status: "Activo",
     date: "18 mar, 2019",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
   {
     id: "6",
@@ -81,7 +81,7 @@ const users = [
     role: "Director",
     status: "Inactivo",
     date: "8 ene, 2025",
-    avatar: "/placeholder.svg",
+    avatar: "/images/perfil.avif",
   },
 ];
 
