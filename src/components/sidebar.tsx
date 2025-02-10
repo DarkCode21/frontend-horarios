@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import {
   LayoutDashboard,
   Clock,
@@ -17,6 +21,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Sidebar({ className }: SidebarProps) {
+  const pathname = usePathname();
+
   return (
     <div
       className={cn(
@@ -29,8 +35,11 @@ export function Sidebar({ className }: SidebarProps) {
           <h2 className="mb-6 px-4 text-3xl font-bold text-blue-600">UNT</h2>
           <div className="space-y-1">
             <Button
-              variant="secondary"
-              className="w-full justify-start"
+              variant={pathname === "/dashboard" ? "secondary" : "ghost"}
+              className={cn(
+                "w-full justify-start",
+                pathname !== "/dashboard" && "text-slate-500"
+              )}
               asChild
             >
               <Link href="/dashboard">
@@ -39,8 +48,15 @@ export function Sidebar({ className }: SidebarProps) {
               </Link>
             </Button>
             <Button
-              variant="ghost"
-              className="w-full justify-start text-slate-500"
+              variant={
+                pathname.startsWith("/dashboard/horarios")
+                  ? "secondary"
+                  : "ghost"
+              }
+              className={cn(
+                "w-full justify-start",
+                !pathname.startsWith("/dashboard/horarios") && "text-slate-500"
+              )}
               asChild
             >
               <Link href="/dashboard/horarios">
@@ -49,8 +65,15 @@ export function Sidebar({ className }: SidebarProps) {
               </Link>
             </Button>
             <Button
-              variant="ghost"
-              className="w-full justify-start text-slate-500"
+              variant={
+                pathname.startsWith("/dashboard/docentes")
+                  ? "secondary"
+                  : "ghost"
+              }
+              className={cn(
+                "w-full justify-start",
+                !pathname.startsWith("/dashboard/docentes") && "text-slate-500"
+              )}
               asChild
             >
               <Link href="/dashboard/docentes">
@@ -59,8 +82,13 @@ export function Sidebar({ className }: SidebarProps) {
               </Link>
             </Button>
             <Button
-              variant="ghost"
-              className="w-full justify-start text-slate-500"
+              variant={
+                pathname.startsWith("/dashboard/cursos") ? "secondary" : "ghost"
+              }
+              className={cn(
+                "w-full justify-start",
+                !pathname.startsWith("/dashboard/cursos") && "text-slate-500"
+              )}
               asChild
             >
               <Link href="/dashboard/cursos">
@@ -69,8 +97,15 @@ export function Sidebar({ className }: SidebarProps) {
               </Link>
             </Button>
             <Button
-              variant="ghost"
-              className="w-full justify-start text-slate-500"
+              variant={
+                pathname.startsWith("/dashboard/usuarios")
+                  ? "secondary"
+                  : "ghost"
+              }
+              className={cn(
+                "w-full justify-start",
+                !pathname.startsWith("/dashboard/usuarios") && "text-slate-500"
+              )}
               asChild
             >
               <Link href="/dashboard/usuarios">
