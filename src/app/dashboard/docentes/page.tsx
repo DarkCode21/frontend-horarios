@@ -1,10 +1,16 @@
-import { Bell } from "lucide-react"
-import { TeachersTable } from "./teachers-table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+"use client";
+
+import React, { useState } from "react";
+import { Bell } from "lucide-react";
+import { TeachersTable } from "./teachers-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import AddTeacherModal from "@/components/AddTeacherModal";
 
 export default function DocentesPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="space-y-8 p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -21,12 +27,19 @@ export default function DocentesPage() {
       </div>
       <Card className="space-y-4 p-7 rounded-3xl">
         <div className="flex justify-between">
-          <Button className="bg-primary">+ Agregar Docente</Button>
+          <Button className="bg-primary" onClick={() => setIsModalOpen(true)}>
+            + Agregar Docente
+          </Button>
           <Input placeholder="Buscar docente..." className="w-[300px]" />
         </div>
         <TeachersTable />
       </Card>
-    </div>
-  )
-}
 
+      {/* Modal */}
+      <AddTeacherModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </div>
+  );
+}

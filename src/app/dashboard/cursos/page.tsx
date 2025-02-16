@@ -1,10 +1,17 @@
+"use client";
+
+import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { CoursesTable } from "./courses-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 
+import AddCourseModal from "@/components/AddCourseModal";
+
 export default function CoursesPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="space-y-8 p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -21,11 +28,20 @@ export default function CoursesPage() {
       </div>
       <Card className="space-y-4 p-7 rounded-3xl">
         <div className="flex justify-between">
-          <Button className="bg-primary">+ Agregar Curso</Button>
+          <Button className="bg-primary" onClick={() => setIsModalOpen(true)}>
+            + Agregar Curso
+          </Button>
           <Input placeholder="Buscar curso..." className="w-[300px]" />
         </div>
+
         <CoursesTable />
       </Card>
+
+      {/* Modal */}
+      <AddCourseModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
