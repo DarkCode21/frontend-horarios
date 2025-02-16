@@ -27,7 +27,7 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid grid-cols-12 gap-8">
-        {/* Column - 65% */}
+
         <div className="col-span-12 lg:col-span-8 space-y-6">
           <MetricCards />
           <div className="rounded-xl border bg-white p-6">
@@ -39,7 +39,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Column - 35% */}
         <div className="col-span-12 lg:col-span-4 space-y-8">
           <CalendarCard />
           <ProgressChart />

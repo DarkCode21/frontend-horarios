@@ -10,13 +10,13 @@ import {
   BookOpen,
   User,
   Settings,
-  MoreHorizontal,
 } from "lucide-react";
 import type React from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import MoreDropdown from "./moreDropdown";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -140,9 +140,7 @@ export function Sidebar({ className }: SidebarProps) {
               1452700120@unitru.edu.pe
             </p>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <MoreDropdown />
         </div>
       </div>
     </div>
