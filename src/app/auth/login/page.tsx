@@ -1,16 +1,47 @@
 "use client";
 
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+import { FiLoader } from "react-icons/fi";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import api from "@/utils/axios";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    router.push("/dashboard");
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await api.post("/api/auth/login", {
+        email,
+        password,
+      });
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
+
+      router.push("/dashboard");
+    } catch (err: any) {
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError("Error al iniciar sesión");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,12 +66,20 @@ export default function LoginPage() {
       </div>
 
       <form className="mt-8 space-y-4" onSubmit={handleLogin}>
+        {error && (
+          <div className="p-2 bg-red-100 text-red-600 text-sm rounded">
+            {error}
+          </div>
+        )}
+
         <div className="space-y-2">
           <Input
             type="email"
             placeholder="Correo electrónico"
             autoComplete="email"
             className="py-6 rounded-xl"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -50,6 +89,8 @@ export default function LoginPage() {
             placeholder="Contraseña"
             autoComplete="current-password"
             className="py-6 rounded-xl"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
@@ -63,12 +104,16 @@ export default function LoginPage() {
           </Link>
         </div>
 
-        <Button
+        <button
           type="submit"
-          className="w-full bg-primary py-6 rounded-lg text-base"
+          disabled={loading}
+          className={`w-full flex items-center justify-center bg-primary text-white py-4 rounded-lg hover:bg-primary/90 transition-colors ${
+            loading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
         >
-          Iniciar Sesión
-        </Button>
+          {loading && <FiLoader className="mr-2 animate-spin" />}
+          {loading ? "Cargando..." : "Iniciar Sesión"}
+        </button>
 
         <div className="relative py-1">
           <div className="absolute inset-0 flex items-center">
