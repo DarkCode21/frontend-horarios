@@ -1,29 +1,41 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Users, BookOpen, User } from "lucide-react";
+import { Users, BookOpen, Home } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import api from "@/utils/axios";
 
 export function MetricCards() {
-  const [professorsCount, setProfessorsCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
+  const [metrics, setMetrics] = useState({
+    professors: 0,
+    courses: 0,
+    classrooms: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchProfessorsCount = async () => {
+    const fetchMetrics = async () => {
       try {
-        const response = await api.get("/api/auth/Dashboard/cantProfesores");
-        setProfessorsCount(response.data);
+        const [profRes, coursesRes, aulasRes] = await Promise.all([
+          api.get("/api/auth/Dashboard/cantProfesores"),
+          api.get("/api/auth/Dashboard/cursosTotales"),
+          api.get("/api/auth/Dashboard/aulasTotales"),
+        ]);
+        setMetrics({
+          professors: profRes.data,
+          courses: coursesRes.data,
+          classrooms: aulasRes.data,
+        });
       } catch (err: any) {
-        console.error("Error al obtener la cantidad de profesores:", err);
-        setError("Error al cargar la cantidad de profesores");
+        console.error("Error al obtener métricas:", err);
+        setError("Error al cargar las métricas");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfessorsCount();
+    fetchMetrics();
   }, []);
 
   return (
@@ -37,7 +49,7 @@ export function MetricCards() {
             ) : error ? (
               <p className="text-2xl font-bold text-destructive">Error</p>
             ) : (
-              <p className="text-2xl font-bold">{professorsCount}</p>
+              <p className="text-2xl font-bold">{metrics.professors}</p>
             )}
             <p className="text-sm text-muted-foreground">
               Cantidad de profesores de la escuela de Informática.
@@ -50,7 +62,13 @@ export function MetricCards() {
         <CardContent className="flex flex-row items-center gap-4 p-6">
           <BookOpen className="h-8 w-8 text-primary" />
           <div>
-            <p className="text-2xl font-bold">60</p>
+            {loading ? (
+              <p className="text-2xl font-bold">-</p>
+            ) : error ? (
+              <p className="text-2xl font-bold text-destructive">Error</p>
+            ) : (
+              <p className="text-2xl font-bold">{metrics.courses}</p>
+            )}
             <p className="text-sm text-muted-foreground">
               Número de cursos inscritos en el sistema.
             </p>
@@ -60,11 +78,17 @@ export function MetricCards() {
 
       <Card>
         <CardContent className="flex flex-row items-center gap-4 p-6">
-          <User className="h-8 w-8 text-primary" />
+          <Home className="h-8 w-8 text-primary" />
           <div>
-            <p className="text-2xl font-bold">45</p>
+            {loading ? (
+              <p className="text-2xl font-bold">-</p>
+            ) : error ? (
+              <p className="text-2xl font-bold text-destructive">Error</p>
+            ) : (
+              <p className="text-2xl font-bold">{metrics.classrooms}</p>
+            )}
             <p className="text-sm text-muted-foreground">
-              Cantidad de usuarios registrados hasta el momento.
+              Número de aulas registradas en el sistema.
             </p>
           </div>
         </CardContent>
