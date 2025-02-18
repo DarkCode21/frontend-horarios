@@ -31,7 +31,7 @@ export default function DashboardPage() {
         <div className="col-span-12 lg:col-span-8 space-y-6">
           <MetricCards />
           <div className="rounded-xl border bg-white p-6">
-            <h3 className="mb-4 text-lg font-medium">Cursos</h3>
+            <h3 className="mb-4 text-lg font-medium">Capacidad de aulas</h3>
             <CursosChart />
           </div>
           <div>

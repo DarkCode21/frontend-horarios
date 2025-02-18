@@ -32,7 +32,7 @@ export function Sidebar({ className }: SidebarProps) {
     >
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-6 px-4 text-3xl font-bold text-blue-600">UNT</h2>
+          <h2 className="mb-6 px-4 text-3xl font-bold text-primary">UNT</h2>
           <div className="space-y-1">
             <Button
               variant={pathname === "/dashboard" ? "secondary" : "ghost"}
@@ -135,10 +135,12 @@ export function Sidebar({ className }: SidebarProps) {
             <AvatarFallback>DV</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium">Deyvi Villegas</p>
-            <p className="text-xs text-slate-500 truncate">
-              1452700120@unitru.edu.pe
-            </p>
+            <Link href="/docente/perfil" className="block">
+              <p className="text-sm font-medium">Deyvi Villegas</p>
+              <p className="text-xs text-slate-500 truncate">
+                1452700120@unitru.edu.pe
+              </p>
+            </Link>
           </div>
           <MoreDropdown />
         </div>

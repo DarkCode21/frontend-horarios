@@ -45,7 +45,7 @@ export function MetricCards() {
           <Users className="h-8 w-8 text-primary" />
           <div>
             {loading ? (
-              <p className="text-2xl font-bold">-</p>
+              <p className="text-2xl font-bold">...</p>
             ) : error ? (
               <p className="text-2xl font-bold text-destructive">Error</p>
             ) : (
@@ -63,7 +63,7 @@ export function MetricCards() {
           <BookOpen className="h-8 w-8 text-primary" />
           <div>
             {loading ? (
-              <p className="text-2xl font-bold">-</p>
+              <p className="text-2xl font-bold">...</p>
             ) : error ? (
               <p className="text-2xl font-bold text-destructive">Error</p>
             ) : (
@@ -81,7 +81,7 @@ export function MetricCards() {
           <Home className="h-8 w-8 text-primary" />
           <div>
             {loading ? (
-              <p className="text-2xl font-bold">-</p>
+              <p className="text-2xl font-bold">...</p>
             ) : error ? (
               <p className="text-2xl font-bold text-destructive">Error</p>
             ) : (
