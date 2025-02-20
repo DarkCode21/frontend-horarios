@@ -27,6 +27,7 @@ interface Docente {
   categoria_docente: string;
   condicion: string;
   total_cursos: number;
+  image_url?: string;
 }
 
 interface DocentesResponse {
@@ -46,17 +47,14 @@ export function TeachersTable({ reload }: TeachersTableProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  // Paginación
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<number>(6);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [lastPage, setLastPage] = useState<number>(1);
 
-  // Estado para manejar modales
   const [viewTeacherId, setViewTeacherId] = useState<number | null>(null);
   const [editTeacherId, setEditTeacherId] = useState<number | null>(null);
 
-  // Carga de docentes
   const fetchDocentes = async (page: number, limit: number) => {
     setLoading(true);
     setError("");
@@ -80,14 +78,12 @@ export function TeachersTable({ reload }: TeachersTableProps) {
 
   useEffect(() => {
     fetchDocentes(currentPage, perPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (reload) {
       fetchDocentes(currentPage, perPage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reload]);
 
   const goToPage = (pageNumber: number) => {
@@ -114,9 +110,7 @@ export function TeachersTable({ reload }: TeachersTableProps) {
     return <div className="p-4 text-red-600">{error}</div>;
   }
 
-  // Callback para refrescar la tabla (si se actualiza un docente)
   const handleTeacherUpdated = () => {
-    // Por ejemplo, recargar en la misma página actual
     fetchDocentes(currentPage, perPage);
   };
 
@@ -145,7 +139,10 @@ export function TeachersTable({ reload }: TeachersTableProps) {
               </TableCell>
               <TableCell className="flex items-center gap-2">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src="/images/perfil.avif" />
+                  <AvatarImage
+                    src={teacher.image_url}
+                    alt={getFullName(teacher)}
+                  />
                   <AvatarFallback>
                     {teacher.nombre ? teacher.nombre[0] : "U"}
                   </AvatarFallback>
@@ -225,7 +222,6 @@ export function TeachersTable({ reload }: TeachersTableProps) {
         </div>
       </div>
 
-      {/* Modal de Ver Detalles */}
       {viewTeacherId && (
         <ViewTeacherModal
           docenteId={viewTeacherId}
@@ -233,7 +229,6 @@ export function TeachersTable({ reload }: TeachersTableProps) {
         />
       )}
 
-      {/* Modal de Editar */}
       {editTeacherId && (
         <EditTeacherModal
           docenteId={editTeacherId}
