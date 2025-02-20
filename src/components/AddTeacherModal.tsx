@@ -11,6 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import api from "@/utils/axios";
+
+interface Category {
+  id: number;
+  nombre: string;
+}
+
+interface Condition {
+  id: number;
+  nombre: string;
+}
 
 interface AddTeacherModalProps {
   open: boolean;
@@ -24,16 +35,52 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
   const [apellidos, setApellidos] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [categoria, setCategoria] = useState("Tiempo Completo");
-  const [condicion, setCondicion] = useState("Principal");
+  const [categoria, setCategoria] = useState("");
+  const [condicion, setCondicion] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [previewURL, setPreviewURL] = useState<string>("");
+  const [previewURL, setPreviewURL] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [categorias, setCategorias] = useState<Category[]>([]);
+  const [condiciones, setCondiciones] = useState<Condition[]>([]);
 
   useEffect(() => {
     setAnimate(true);
+  }, []);
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const response = await api.get<Category[]>(
+          "/api/auth/Docentes/categoriaDocente"
+        );
+        setCategorias(response.data);
+        if (response.data.length > 0) {
+          setCategoria(response.data[0].nombre);
+        }
+      } catch (error) {
+        console.error("Error al obtener categorías:", error);
+      }
+    };
+
+    const fetchCondiciones = async () => {
+      try {
+        const response = await api.get<Condition[]>(
+          "/api/auth/Docentes/condicionDocente"
+        );
+        setCondiciones(response.data);
+        if (response.data.length > 0) {
+          setCondicion(response.data[0].nombre);
+        }
+      } catch (error) {
+        console.error("Error al obtener condiciones:", error);
+      }
+    };
+
+    fetchCategorias();
+    fetchCondiciones();
   }, []);
 
   if (!open) return null;
@@ -76,17 +123,12 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={animate ? { opacity: 1, scale: 1 } : {}}
         transition={{ duration: 0.3 }}
-        className="
-          bg-card text-card-foreground p-6 rounded-xl shadow w-[500px]
-          relative transform
-        "
+        className="bg-card text-card-foreground p-6 rounded-xl shadow w-[600px] relative transform"
       >
         <h2 className="text-lg font-semibold mb-4">Agregar Docente</h2>
-
-        {/* Formulario */}
         <form onSubmit={handleSubmit}>
           <div className="mb-6 flex justify-center">
-            <div className="w-32 h-32 relative group cursor-pointer">
+            <div className="w-40 h-40 relative group cursor-pointer">
               <img
                 src={previewURL || "/images/perfil.avif"}
                 alt="Foto perfil"
@@ -113,6 +155,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
                 value={nombres}
                 onChange={(e) => setNombres(e.target.value)}
                 placeholder="Nombres Completos"
+                required
               />
             </div>
             <div>
@@ -125,6 +168,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
                 value={apellidos}
                 onChange={(e) => setApellidos(e.target.value)}
                 placeholder="Apellidos completos"
+                required
               />
             </div>
 
@@ -138,6 +182,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="ejemplo@gmail.com"
+                required
               />
             </div>
             <div>
@@ -150,6 +195,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Contraseña"
+                required
               />
             </div>
 
@@ -161,6 +207,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
                 placeholder="987654321"
+                required
               />
             </div>
             <div>
@@ -177,31 +224,36 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
             </div>
 
             <div>
-              <span className="text-sm text-muted-foreground">
+              <label className="block font-normal text-sm mb-1">
                 Categoría docente
-              </span>
-              <Select defaultValue="Tiempo completo">
+              </label>
+              <Select value={categoria} onValueChange={setCategoria} required>
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecciona categoría" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Tiempo completo">
-                    Tiempo completo
-                  </SelectItem>
-                  <SelectItem value="Tiempo parcial">Tiempo parcial</SelectItem>
+                  {categorias.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.nombre}>
+                      {cat.nombre}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <span className="text-sm text-muted-foreground">Condición</span>
-              <Select defaultValue="Principal">
+              <label className="block font-normal text-sm mb-1">
+                Condición
+              </label>
+              <Select value={condicion} onValueChange={setCondicion} required>
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue placeholder="Selecciona condición" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Principal">Principal</SelectItem>
-                  <SelectItem value="Asociado">Asociado</SelectItem>
-                  <SelectItem value="Auxiliar">Auxiliar</SelectItem>
+                  {condiciones.map((cond) => (
+                    <SelectItem key={cond.id} value={cond.nombre}>
+                      {cond.nombre}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

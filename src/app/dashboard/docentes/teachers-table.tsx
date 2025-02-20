@@ -1,6 +1,8 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
+
 import {
   Table,
   TableBody,
@@ -20,71 +22,83 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
+import api from "@/utils/axios";
 
-const teachers = [
-  {
-    id: "1",
-    name: "Ricardo Manuel Guevara Ruiz",
-    email: "rguevara@unitru.edu.pe",
-    phone: "908546758",
-    status: "Contratado",
-    courses: 2,
-    date: "18 sep, 2015",
-    avatar: "/images/perfil.avif",
-  },
-  {
-    id: "2",
-    name: "Yenny Milagritos Sifuentes-Díaz",
-    email: "ysifuentes@unitru.edu.pe",
-    phone: "908546758",
-    status: "Contratado",
-    courses: 1,
-    date: "18 mar, 2019",
-    avatar: "/images/perfil.avif",
-  },
-  {
-    id: "3",
-    name: "Edwin Raul Mendoza Torres",
-    email: "edwin@unitru.edu.pe",
-    phone: "908546758",
-    status: "Contratado",
-    courses: 0,
-    date: "8 ene, 2025",
-    avatar: "/images/perfil.avif",
-  },
-  {
-    id: "4",
-    name: "Ricardo Manuel Guevara Ruiz",
-    email: "rguevara@unitru.edu.pe",
-    phone: "908546758",
-    status: "Contratado",
-    courses: 2,
-    date: "18 sep, 2015",
-    avatar: "/images/perfil.avif",
-  },
-  {
-    id: "5",
-    name: "Yenny Milagritos Sifuentes-Díaz",
-    email: "ysifuentes@unitru.edu.pe",
-    phone: "908546758",
-    status: "Contratado",
-    courses: 1,
-    date: "18 mar, 2019",
-    avatar: "/images/perfil.avif",
-  },
-  {
-    id: "6",
-    name: "Edwin Raul Mendoza Torres",
-    email: "edwin@unitru.edu.pe",
-    phone: "908546758",
-    status: "Contratado",
-    courses: 0,
-    date: "8 ene, 2025",
-    avatar: "/images/perfil.avif",
-  },
-];
+interface Docente {
+  id: number;
+  nombre: string;
+  apellidoP: string;
+  telefono: string;
+  email: string;
+  categoria_docente: string;
+  condicion: string;
+  total_cursos: number;
+}
+
+interface DocentesResponse {
+  current_page: number;
+  data: Docente[];
+  last_page: number;
+  per_page: number;
+  total: number;
+}
 
 export function TeachersTable() {
+  const [docentes, setDocentes] = useState<Docente[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(6);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [lastPage, setLastPage] = useState<number>(1);
+
+  const fetchDocentes = async (page: number, limit: number) => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await api.get<DocentesResponse>(
+        `/api/auth/Docentes/listarDocentes?page=${page}&per_page=${limit}`
+      );
+      const data = response.data;
+      setDocentes(data.data);
+      setCurrentPage(data.current_page);
+      setLastPage(data.last_page);
+      setPerPage(data.per_page);
+      setTotalItems(data.total);
+    } catch (err: any) {
+      console.error("Error al obtener docentes:", err);
+      setError("Error al cargar docentes.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDocentes(currentPage, perPage);
+  }, []);
+
+  const goToPage = (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > lastPage) return;
+    fetchDocentes(pageNumber, perPage);
+  };
+
+  const handlePerPageChange = (newPerPage: number) => {
+    setPerPage(newPerPage);
+    fetchDocentes(1, newPerPage);
+  };
+
+  const getFullName = (doc: Docente) => {
+    return `${doc.nombre} ${doc.apellidoP}`;
+  };
+
+  if (loading) {
+    return <div className="p-4">Cargando docentes...</div>;
+  }
+  if (error) {
+    return <div className="p-4 text-red-600">{error}</div>;
+  }
+
   return (
     <div>
       <Table>
@@ -95,31 +109,33 @@ export function TeachersTable() {
             </TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Correo</TableHead>
-            <TableHead>Celular</TableHead>
-            <TableHead>Rol</TableHead>
+            <TableHead>Teléfono</TableHead>
+            <TableHead>Categoría</TableHead>
+            <TableHead>Condición</TableHead>
             <TableHead>N° Cursos</TableHead>
-            <TableHead>Fecha</TableHead>
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="py-10">
-          {teachers.map((teacher) => (
+        <TableBody>
+          {docentes.map((teacher) => (
             <TableRow key={teacher.id} className="space-y-3">
               <TableCell>
                 <Checkbox />
               </TableCell>
               <TableCell className="flex items-center gap-2">
                 <Avatar className="h-10 w-10">
-                  <AvatarImage src={teacher.avatar} />
-                  <AvatarFallback>{teacher.name[0]}</AvatarFallback>
+                  <AvatarImage src="/images/perfil.avif" />
+                  <AvatarFallback>
+                    {teacher.nombre ? teacher.nombre[0] : "U"}
+                  </AvatarFallback>
                 </Avatar>
-                {teacher.name}
+                {getFullName(teacher)}
               </TableCell>
               <TableCell>{teacher.email}</TableCell>
-              <TableCell>{teacher.phone}</TableCell>
-              <TableCell>{teacher.status}</TableCell>
-              <TableCell>{teacher.courses}</TableCell>
-              <TableCell>{teacher.date}</TableCell>
+              <TableCell>{teacher.telefono}</TableCell>
+              <TableCell>{teacher.categoria_docente}</TableCell>
+              <TableCell>{teacher.condicion}</TableCell>
+              <TableCell>{teacher.total_cursos}</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -143,34 +159,57 @@ export function TeachersTable() {
           ))}
         </TableBody>
       </Table>
+
       <div className="flex items-center justify-between px-4 py-4 border-t">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          Mostrando:
-          <select className="border rounded px-2 py-1">
-            <option>6</option>
-            <option>12</option>
-            <option>24</option>
+          Mostrando {docentes.length} de {totalItems}
+          <span>|</span>
+          <label htmlFor="perPageSelect">por página:</label>
+          <select
+            id="perPageSelect"
+            value={perPage}
+            onChange={(e) => handlePerPageChange(Number(e.target.value))}
+            className="border rounded px-2 py-1"
+          >
+            <option value="6">6</option>
+            <option value="12">12</option>
+            <option value="24">24</option>
           </select>
-          de 30
         </div>
+
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
-            Prev
-          </Button>
           <Button
             variant="outline"
             size="sm"
-            className="bg-primary text-white"
+            disabled={currentPage <= 1}
+            onClick={() => goToPage(currentPage - 1)}
           >
-            1
+            Prev
           </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
+
+          {[...Array(lastPage)].map((_, index) => {
+            const pageNum = index + 1;
+            return (
+              <Button
+                key={pageNum}
+                variant="outline"
+                size="sm"
+                className={
+                  pageNum === currentPage ? "bg-primary text-white" : ""
+                }
+                onClick={() => goToPage(pageNum)}
+              >
+                {pageNum}
+              </Button>
+            );
+          })}
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= lastPage}
+            onClick={() => goToPage(currentPage + 1)}
+          >
             Next
           </Button>
         </div>
