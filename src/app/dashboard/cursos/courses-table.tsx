@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import {
   Table,
@@ -20,65 +21,76 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import api from "@/utils/axios";
 
-const courses = [
-  {
-    id: "1",
-    name: "Sistema Operativos I",
-    cycle: "VII",
-    modalities: ["Teoría", "Práctica", "Laboratorio"],
-    credits: 4,
-    status: "Activo",
-    date: "18 sep, 2015",
-  },
-  {
-    id: "2",
-    name: "Desarrollo de Software",
-    cycle: "VII",
-    modalities: ["Teoría", "Práctica", "Laboratorio"],
-    credits: 4,
-    status: "Activo",
-    date: "18 mar, 2019",
-  },
-  {
-    id: "3",
-    name: "Sistemas de Información",
-    cycle: "X",
-    modalities: ["Teoría", "Práctica", "Laboratorio"],
-    credits: 3,
-    status: "Activo",
-    date: "8 ene, 2025",
-  },
-  {
-    id: "4",
-    name: "Proyecto de Tesis",
-    cycle: "IX",
-    modalities: ["Teoría", "Práctica"],
-    credits: 2,
-    status: "Activo",
-    date: "18 sep, 2015",
-  },
-  {
-    id: "5",
-    name: "Proyecto Integrador",
-    cycle: "X",
-    modalities: ["Teoría", "Práctica", "Laboratorio"],
-    credits: 4,
-    status: "Activo",
-    date: "18 mar, 2019",
-  },
-  {
-    id: "6",
-    name: "Arquitectura de Computadoras",
-    cycle: "VI",
-    modalities: ["Teoría", "Práctica", "Laboratorio"],
-    credits: 4,
-    status: "Activo",
-    date: "8 ene, 2025",
-  },
-];
+interface Course {
+  curso_id: number;
+  curso_nombre: string;
+  ciclo_nombre: string;
+  creditos: number;
+  modalidades: string[];
+}
+
+interface CoursesResponse {
+  data: Course[];
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
 
 export function CoursesTable() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(6);
+  const [totalItems, setTotalItems] = useState<number>(0);
+  const [lastPage, setLastPage] = useState<number>(1);
+
+  const fetchCourses = async (page: number, limit: number) => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await api.get<CoursesResponse>(
+        `/api/auth/Cursos/listarcursos?page=${page}&per_page=${limit}`
+      );
+      const data = response.data;
+      setCourses(data.data);
+      setCurrentPage(data.current_page);
+      setLastPage(data.last_page);
+      setPerPage(data.per_page);
+      setTotalItems(data.total);
+    } catch (err: any) {
+      console.error("Error al obtener cursos:", err);
+      setError("Error al cargar cursos.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses(currentPage, perPage);
+  }, []);
+
+  const goToPage = (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > lastPage) return;
+    fetchCourses(pageNumber, perPage);
+  };
+
+  const handlePerPageChange = (newPerPage: number) => {
+    setPerPage(newPerPage);
+    fetchCourses(1, newPerPage);
+  };
+
+  if (loading) {
+    return <div className="p-4">Cargando cursos...</div>;
+  }
+  if (error) {
+    return <div className="p-4 text-red-600">{error}</div>;
+  }
+
   return (
     <div>
       <Table>
@@ -98,15 +110,17 @@ export function CoursesTable() {
         </TableHeader>
         <TableBody>
           {courses.map((course) => (
-            <TableRow key={course.id}>
+            <TableRow key={course.curso_id}>
               <TableCell>
                 <Checkbox />
               </TableCell>
-              <TableCell className="font-medium">{course.name}</TableCell>
-              <TableCell>{course.cycle}</TableCell>
+              <TableCell className="font-medium">
+                {course.curso_nombre}
+              </TableCell>
+              <TableCell>{course.ciclo_nombre}</TableCell>
               <TableCell>
                 <div className="flex flex-col gap-1">
-                  {course.modalities.map((modality) => (
+                  {course.modalidades.map((modality) => (
                     <span
                       key={modality}
                       className="text-sm text-muted-foreground"
@@ -116,16 +130,16 @@ export function CoursesTable() {
                   ))}
                 </div>
               </TableCell>
-              <TableCell>{course.credits}</TableCell>
+              <TableCell>{course.creditos}</TableCell>
               <TableCell>
                 <Badge
                   variant="outline"
                   className="bg-green-50 text-green-600 border-green-200"
                 >
-                  {course.status}
+                  Activo
                 </Badge>
               </TableCell>
-              <TableCell>{course.date}</TableCell>
+              <TableCell>N/A</TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -149,30 +163,54 @@ export function CoursesTable() {
           ))}
         </TableBody>
       </Table>
+
       <div className="flex items-center justify-between px-4 py-4 border-t">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          Mostrando:
-          <select className="border rounded px-2 py-1">
-            <option>6</option>
-            <option>12</option>
-            <option>24</option>
+          Mostrando {courses.length} de {totalItems} | por página:
+          <select
+            value={perPage}
+            onChange={(e) => handlePerPageChange(Number(e.target.value))}
+            className="border rounded px-2 py-1"
+          >
+            <option value="6">6</option>
+            <option value="12">12</option>
+            <option value="24">24</option>
           </select>
-          de 30
         </div>
+
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => goToPage(currentPage - 1)}
+          >
             Prev
           </Button>
-          <Button variant="outline" size="sm" className="bg-primary text-white">
-            1
-          </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
+
+          {[...Array(lastPage)].map((_, index) => {
+            const pageNum = index + 1;
+            return (
+              <Button
+                key={pageNum}
+                variant="outline"
+                size="sm"
+                className={
+                  pageNum === currentPage ? "bg-primary text-white" : ""
+                }
+                onClick={() => goToPage(pageNum)}
+              >
+                {pageNum}
+              </Button>
+            );
+          })}
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= lastPage}
+            onClick={() => goToPage(currentPage + 1)}
+          >
             Next
           </Button>
         </div>

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import api from "@/utils/axios";
+import Loader from "@/components/loader";
 
 interface Docente {
   id: number;
@@ -93,7 +94,11 @@ export function TeachersTable() {
   };
 
   if (loading) {
-    return <div className="p-4">Cargando docentes...</div>;
+    return (
+      <div className="p-4 min-h-[500px] flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
   if (error) {
     return <div className="p-4 text-red-600">{error}</div>;
