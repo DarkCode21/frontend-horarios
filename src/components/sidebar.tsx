@@ -21,7 +21,10 @@ export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const userData = getUserData();
 
-  const userName = userData?.info_usuario?.nombre || "Usuario";
+  const userName = `${userData?.info_usuario?.nombre || ""} ${
+    userData?.info_usuario?.apellidoP || ""
+  }`.trim();
+
   const userEmail = userData?.email || "correo@dominio.com";
   const userImage = userData?.info_usuario?.image_url || "/images/perfil.avif";
 

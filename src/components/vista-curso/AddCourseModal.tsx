@@ -19,14 +19,14 @@ interface AddCourseModalProps {
 
 export default function AddCourseModal({ open, onClose }: AddCourseModalProps) {
   const [animate, setAnimate] = useState(false);
-  const [cycles, setCycles] = useState<string[]>([]);
+  const [cycles, setCycles] = useState<{ id: number; nombre: string }[]>([]);
   const [courses, setCourses] = useState<{ id: number; nombre: string }[]>([]);
   const [selectedCycle, setSelectedCycle] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
 
   const fetchCycles = async () => {
     try {
-      const response = await api.get<string[]>(
+      const response = await api.get<{ id: number; nombre: string }[]>(
         "/api/auth/Cursos/cicloPeriodos"
       );
       setCycles(response.data);
@@ -73,9 +73,9 @@ export default function AddCourseModal({ open, onClose }: AddCourseModalProps) {
               <SelectValue placeholder="Seleccione un ciclo" />
             </SelectTrigger>
             <SelectContent>
-              {cycles.map((cycle, index) => (
-                <SelectItem key={index} value={cycle}>
-                  {cycle}
+              {cycles.map((cycle) => (
+                <SelectItem key={cycle.id} value={cycle.nombre}>
+                  {cycle.nombre}
                 </SelectItem>
               ))}
             </SelectContent>
