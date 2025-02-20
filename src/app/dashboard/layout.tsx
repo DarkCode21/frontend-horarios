@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
+import { getUserRole } from "@/utils/jwt";
+import Loader from "@/components/loader";
 
 export default function DashboardLayout({
   children,
@@ -17,14 +19,19 @@ export default function DashboardLayout({
     if (!token) {
       router.replace("/auth/login");
     } else {
-      setIsCheckingAuth(false);
+      const role = getUserRole();
+      if (role !== 1) {
+        router.replace("/docente");
+      } else {
+        setIsCheckingAuth(false);
+      }
     }
   }, [router]);
 
   if (isCheckingAuth) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Cargando...</p>
+        <Loader />
       </div>
     );
   }

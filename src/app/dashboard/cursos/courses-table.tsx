@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import Loader from "@/components/loader";
 import api from "@/utils/axios";
 
 interface Course {
@@ -85,7 +86,11 @@ export function CoursesTable() {
   };
 
   if (loading) {
-    return <div className="p-4">Cargando cursos...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    );
   }
   if (error) {
     return <div className="p-4 text-red-600">{error}</div>;

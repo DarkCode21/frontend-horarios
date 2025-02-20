@@ -22,11 +22,17 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import MoreDropdown from "./moreDropdown";
+import { getUserData } from "@/utils/jwt";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function DocenteSidebar({ className }: SidebarProps) {
   const pathname = usePathname();
+  const userData = getUserData();
+
+  const userName = userData?.info_usuario?.nombre || "Usuario";
+  const userEmail = userData?.email || "correo@dominio.com";
+  const userImage = userData?.info_usuario?.image_url || "/images/perfil.avif";
 
   return (
     <div
@@ -140,15 +146,13 @@ export function DocenteSidebar({ className }: SidebarProps) {
         </div>
         <div className="px-4 flex items-center gap-3">
           <Avatar>
-            <AvatarImage src="/images/perfil.avif" />
-            <AvatarFallback>RG</AvatarFallback>
+            <AvatarImage src={userImage} />
+            <AvatarFallback>{userName[0]}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <Link href="/docente/perfil" className="block">
-              <p className="text-sm font-medium">Ricardo Guevara</p>
-              <p className="text-xs text-slate-500 truncate">
-                rguevara@unitru.edu.pe
-              </p>
+              <p className="text-sm font-medium">{userName}</p>
+              <p className="text-xs text-slate-500 truncate">{userEmail}</p>
             </Link>
           </div>
           <MoreDropdown />

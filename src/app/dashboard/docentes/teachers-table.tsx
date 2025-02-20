@@ -95,7 +95,7 @@ export function TeachersTable() {
 
   if (loading) {
     return (
-      <div className="p-4 min-h-[500px] flex items-center justify-center">
+      <div className="flex items-center justify-center h-screen">
         <Loader />
       </div>
     );
