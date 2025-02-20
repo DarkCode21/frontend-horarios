@@ -17,6 +17,7 @@ import api from "@/utils/axios";
 import ActionsDropdown from "@/components/Vista-docente/ActionsDropdown-docente";
 import ViewTeacherModal from "@/components/Vista-docente/ViewTeacherModal";
 import EditTeacherModal from "@/components/Vista-docente/EditTeacherModal";
+import ConfirmDeleteModal from "@/components/Vista-docente/ConfirmDeleteModal"; // Importa el modal de confirmación
 
 interface Docente {
   id: number;
@@ -52,8 +53,13 @@ export function TeachersTable({ reload }: TeachersTableProps) {
   const [totalItems, setTotalItems] = useState<number>(0);
   const [lastPage, setLastPage] = useState<number>(1);
 
+  // Estados para manejar los modales
   const [viewTeacherId, setViewTeacherId] = useState<number | null>(null);
   const [editTeacherId, setEditTeacherId] = useState<number | null>(null);
+  const [deleteTeacher, setDeleteTeacher] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
   const fetchDocentes = async (page: number, limit: number) => {
     setLoading(true);
@@ -114,6 +120,12 @@ export function TeachersTable({ reload }: TeachersTableProps) {
     fetchDocentes(currentPage, perPage);
   };
 
+  // Funciones para abrir modales
+  const handleViewDetails = (teacher: Docente) => setViewTeacherId(teacher.id);
+  const handleEdit = (teacher: Docente) => setEditTeacherId(teacher.id);
+  const handleDelete = (teacher: Docente) =>
+    setDeleteTeacher({ id: teacher.id, name: getFullName(teacher) });
+
   return (
     <div>
       <Table>
@@ -140,9 +152,9 @@ export function TeachersTable({ reload }: TeachersTableProps) {
               <TableCell className="flex items-center gap-2">
                 <Avatar className="h-10 w-10">
                   <AvatarImage
-                    src={teacher.image_url}
+                    src={teacher.image_url || "/images/perfil.avif"}
                     alt={getFullName(teacher)}
-                    className="h-full w-full object-cover"
+                    className="object-cover"
                   />
                   <AvatarFallback>
                     {teacher.nombre ? teacher.nombre[0] : "U"}
@@ -157,9 +169,9 @@ export function TeachersTable({ reload }: TeachersTableProps) {
               <TableCell>{teacher.total_cursos}</TableCell>
               <TableCell>
                 <ActionsDropdown
-                  onViewDetails={() => setViewTeacherId(teacher.id)}
-                  onEdit={() => setEditTeacherId(teacher.id)}
-                  onDelete={() => alert("Eliminar: " + teacher.email)}
+                  onViewDetails={() => handleViewDetails(teacher)}
+                  onEdit={() => handleEdit(teacher)}
+                  onDelete={() => handleDelete(teacher)}
                 />
               </TableCell>
             </TableRow>
@@ -167,7 +179,6 @@ export function TeachersTable({ reload }: TeachersTableProps) {
         </TableBody>
       </Table>
 
-      {/* Pagina */}
       <div className="flex items-center justify-between px-4 py-4 border-t">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           Mostrando {docentes.length} de {totalItems}
@@ -223,18 +234,26 @@ export function TeachersTable({ reload }: TeachersTableProps) {
         </div>
       </div>
 
+      {/* Modales */}
       {viewTeacherId && (
         <ViewTeacherModal
           docenteId={viewTeacherId}
           onClose={() => setViewTeacherId(null)}
         />
       )}
-
       {editTeacherId && (
         <EditTeacherModal
           docenteId={editTeacherId}
           onClose={() => setEditTeacherId(null)}
           onTeacherUpdated={handleTeacherUpdated}
+        />
+      )}
+      {deleteTeacher && (
+        <ConfirmDeleteModal
+          docenteId={deleteTeacher.id}
+          teacherName={deleteTeacher.name}
+          onClose={() => setDeleteTeacher(null)}
+          onDeleted={handleTeacherUpdated}
         />
       )}
     </div>

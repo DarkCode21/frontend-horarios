@@ -140,7 +140,7 @@ export function Sidebar({ className }: { className?: string }) {
             <AvatarFallback>{userName[0]}</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <Link href="/docente/perfil" className="block">
+            <Link href="/dashboard/perfil" className="block">
               <p className="text-sm font-medium">{userName}</p>
               <p className="text-xs text-slate-500 truncate">{userEmail}</p>
             </Link>
