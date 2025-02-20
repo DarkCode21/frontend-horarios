@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { getUserData } from "@/utils/jwt"; // Importa la función que obtiene el usuario
+import { getUserData } from "@/utils/jwt"; 
 
 const formSchema = z
   .object({

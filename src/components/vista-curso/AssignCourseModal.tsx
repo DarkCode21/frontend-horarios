@@ -21,6 +21,7 @@ export default function AssignCourseModal({
   onClose,
 }: AssignCourseModalProps) {
   const [animate, setAnimate] = useState(false);
+
   const [docentes, setDocentes] = useState<any[]>([]);
   const [aulas, setAulas] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
@@ -77,6 +78,27 @@ export default function AssignCourseModal({
     }
   }, [open]);
 
+  const handleSave = async () => {
+    try {
+      const payload = {
+        modalidad_id: selectedModalidad,
+        cursociclo_id: selectedCourse,
+        infousuario_id: selectedDocente,
+        aula_id: selectedAula,
+      };
+
+      const response = await api.post(
+        "/api/auth/Cursos/asignarcursos",
+        payload
+      );
+      console.log("Asignación exitosa:", response.data);
+
+      onClose();
+    } catch (error) {
+      console.error("Error al asignar curso:", error);
+    }
+  };
+
   if (!open) return null;
 
   return (
@@ -94,14 +116,14 @@ export default function AssignCourseModal({
               <span className="text-sm text-muted-foreground">Profesor</span>
               <Select
                 value={selectedDocente}
-                onValueChange={setSelectedDocente}
+                onValueChange={(value) => setSelectedDocente(value)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccione un profesor" />
                 </SelectTrigger>
                 <SelectContent>
                   {docentes.map((docente) => (
-                    <SelectItem key={docente.id} value={docente.nombre}>
+                    <SelectItem key={docente.id} value={String(docente.id)}>
                       {`${docente.nombre} ${docente.apellidoP}`}
                     </SelectItem>
                   ))}
@@ -110,13 +132,16 @@ export default function AssignCourseModal({
             </div>
             <div className="mb-4">
               <span className="text-sm text-muted-foreground">Aula</span>
-              <Select value={selectedAula} onValueChange={setSelectedAula}>
+              <Select
+                value={selectedAula}
+                onValueChange={(value) => setSelectedAula(value)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccione un aula" />
                 </SelectTrigger>
                 <SelectContent>
                   {aulas.map((aula) => (
-                    <SelectItem key={aula.id} value={aula.nombre}>
+                    <SelectItem key={aula.id} value={String(aula.id)}>
                       {aula.nombre}
                     </SelectItem>
                   ))}
@@ -124,16 +149,20 @@ export default function AssignCourseModal({
               </Select>
             </div>
           </div>
+
           <div>
             <div className="mb-4">
               <span className="text-sm text-muted-foreground">Curso</span>
-              <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+              <Select
+                value={selectedCourse}
+                onValueChange={(value) => setSelectedCourse(value)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccione un curso" />
                 </SelectTrigger>
                 <SelectContent>
                   {courses.map((course) => (
-                    <SelectItem key={course.id} value={course.nombre}>
+                    <SelectItem key={course.id} value={String(course.id)}>
                       {course.nombre}
                     </SelectItem>
                   ))}
@@ -144,14 +173,14 @@ export default function AssignCourseModal({
               <span className="text-sm text-muted-foreground">Modalidad</span>
               <Select
                 value={selectedModalidad}
-                onValueChange={setSelectedModalidad}
+                onValueChange={(value) => setSelectedModalidad(value)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccione modalidad" />
                 </SelectTrigger>
                 <SelectContent>
                   {modalidades.map((modalidad) => (
-                    <SelectItem key={modalidad.id} value={modalidad.nombre}>
+                    <SelectItem key={modalidad.id} value={String(modalidad.id)}>
                       {modalidad.nombre}
                     </SelectItem>
                   ))}
@@ -164,18 +193,8 @@ export default function AssignCourseModal({
           <Button variant="secondary" onClick={onClose}>
             Cancelar
           </Button>
-          <Button
-            onClick={() =>
-              console.log(
-                selectedDocente,
-                selectedAula,
-                selectedCourse,
-                selectedModalidad
-              )
-            }
-          >
-            Guardar
-          </Button>
+
+          <Button onClick={handleSave}>Guardar</Button>
         </div>
       </motion.div>
     </div>

@@ -6,6 +6,7 @@ import { CoursesTable } from "./courses-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { getUserData } from "@/utils/jwt";
 
 import AddCourseModal from "@/components/vista-curso/AddCourseModal";
 import AssignCourseModal from "@/components/vista-curso/AssignCourseModal";
@@ -13,13 +14,15 @@ import AssignCourseModal from "@/components/vista-curso/AssignCourseModal";
 export default function CoursesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const userData = getUserData();
+  const firstName = userData?.info_usuario?.nombre || "Invitado";
 
   return (
     <div className="space-y-8 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Cursos</h2>
-          <p className="text-muted-foreground">Hola, Deyvi</p>
+          <p className="text-muted-foreground">Hola, {firstName}</p>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon">

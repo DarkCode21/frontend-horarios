@@ -1,6 +1,7 @@
+"use client";
+
 import { Bell } from "lucide-react";
 
-import { Sidebar } from "@/components/sidebar";
 import { MetricCards } from "@/components/metric-cards";
 import { TeachersTable } from "@/components/teachers-table";
 import { CalendarCard } from "@/components/calendar";
@@ -8,8 +9,12 @@ import { ProgressChart } from "@/components/progress-chart";
 import { CursosChart } from "@/components/courses-chart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getUserData } from "@/utils/jwt";
 
 export default function DashboardPage() {
+  const userData = getUserData();
+  const firstName = userData?.info_usuario?.nombre || "Invitado";
+
   return (
     <div className="flex-1 space-y-8 p-8 pt-6">
       <div className="flex items-center justify-between">
@@ -17,7 +22,7 @@ export default function DashboardPage() {
           <h2 className="text-3xl font-bold tracking-tight">
             Panel de Control
           </h2>
-          <p className="text-muted-foreground">Hola, Deyvi</p>
+          <p className="text-muted-foreground">Hola, {firstName}</p>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon">
@@ -27,7 +32,6 @@ export default function DashboardPage() {
         </div>
       </div>
       <div className="grid grid-cols-12 gap-8">
-
         <div className="col-span-12 lg:col-span-8 space-y-6">
           <MetricCards />
           <div className="rounded-xl border bg-white p-6">

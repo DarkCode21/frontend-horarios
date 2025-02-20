@@ -9,6 +9,7 @@ import {
   BookOpen,
   User,
   Settings,
+  HelpCircle,
 } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
@@ -122,6 +123,20 @@ export function Sidebar({ className }: { className?: string }) {
         </div>
       </div>
       <div className="absolute bottom-4 left-0 right-0 space-y-4">
+        <div className="px-3">
+          <Button
+            variant={
+              pathname === "/dashboard/configuracion" ? "secondary" : "ghost"
+            }
+            className="w-full justify-start text-slate-500"
+            asChild
+          >
+            <Link href="/dashboard/preguntas-frecuentes">
+              <HelpCircle className="mr-2 h-4 w-4" />
+              Preguntas frecuentes
+            </Link>
+          </Button>
+        </div>
         <div className="px-3">
           <Button
             variant="ghost"

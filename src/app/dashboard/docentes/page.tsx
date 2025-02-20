@@ -7,11 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import AddTeacherModal from "@/components/Vista-docente/AddTeacherModal";
+import { getUserData } from "@/utils/jwt";
 
 export default function DocentesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [reload, setReload] = useState(false);
+
+  const userData = getUserData();
+  const firstName = userData?.info_usuario?.nombre || "Invitado";
 
   const handleTeacherCreated = () => {
     setReload((prev) => !prev);
@@ -23,7 +27,7 @@ export default function DocentesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Docentes</h2>
-          <p className="text-muted-foreground">Hola, Deyvi</p>
+          <p className="text-muted-foreground">Hola, {firstName}</p>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon">

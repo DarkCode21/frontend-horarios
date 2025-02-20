@@ -1,16 +1,22 @@
+"use client";
+
 import { Bell } from "lucide-react";
 import { UsersTable } from "./users-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { getUserData } from "@/utils/jwt";
 
 export default function UsersPage() {
+  const userData = getUserData();
+  const firstName = userData?.info_usuario?.nombre || "Invitado";
+
   return (
     <div className="space-y-8 p-8 pt-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Usuarios</h2>
-          <p className="text-muted-foreground">Hola, Deyvi</p>
+          <p className="text-muted-foreground">Hola, {firstName}</p>
         </div>
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon">
