@@ -142,6 +142,7 @@ export function TeachersTable({ reload }: TeachersTableProps) {
                   <AvatarImage
                     src={teacher.image_url}
                     alt={getFullName(teacher)}
+                    className="h-full w-full object-cover"
                   />
                   <AvatarFallback>
                     {teacher.nombre ? teacher.nombre[0] : "U"}
