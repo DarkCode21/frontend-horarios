@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 
-import AddCourseModal from "@/components/AddCourseModal";
+import AddCourseModal from "@/components/vista-curso/AddCourseModal";
+import AssignCourseModal from "@/components/vista-curso/AssignCourseModal";
 
 export default function CoursesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
   return (
     <div className="space-y-8 p-8 pt-6">
@@ -28,19 +30,31 @@ export default function CoursesPage() {
       </div>
       <Card className="space-y-4 p-7 rounded-3xl">
         <div className="flex justify-between">
-          <Button className="bg-primary" onClick={() => setIsModalOpen(true)}>
-            + Agregar Curso
-          </Button>
+          <div className="flex gap-2">
+            <Button className="bg-primary" onClick={() => setIsModalOpen(true)}>
+              + Agregar Curso
+            </Button>
+            <Button
+              className="bg-primary"
+              onClick={() => setIsAssignModalOpen(true)}
+            >
+              + Asignar Curso
+            </Button>
+          </div>
           <Input placeholder="Buscar curso..." className="w-[300px]" />
         </div>
 
         <CoursesTable />
       </Card>
 
-      {/* Modal */}
+      {/* Modales */}
       <AddCourseModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+      <AssignCourseModal
+        open={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
       />
     </div>
   );
