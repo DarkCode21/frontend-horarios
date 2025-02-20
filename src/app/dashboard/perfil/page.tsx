@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,29 +20,28 @@ import {
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
+import { getUserData } from "@/utils/jwt"; // Importa la función que obtiene el usuario
 
 const formSchema = z
   .object({
     profileImage: z.string().optional(),
-    firstName: z.string().min(2, {
-      message: "El nombre debe tener al menos 2 caracteres.",
-    }),
-    lastName: z.string().min(2, {
-      message: "Los apellidos deben tener al menos 2 caracteres.",
-    }),
-    email: z.string().email({
-      message: "Por favor ingrese un correo electrónico válido.",
-    }),
-    password: z.string().min(8, {
-      message: "La contraseña debe tener al menos 8 caracteres.",
-    }),
+    firstName: z
+      .string()
+      .min(2, { message: "El nombre debe tener al menos 2 caracteres." }),
+    lastName: z
+      .string()
+      .min(2, { message: "Los apellidos deben tener al menos 2 caracteres." }),
+    email: z.string().email({ message: "Ingrese un correo válido." }),
+    password: z
+      .string()
+      .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
     confirmPassword: z.string(),
-    phone: z.string().regex(/^\+?[0-9]{9,15}$/, {
-      message: "Por favor ingrese un número de teléfono válido.",
-    }),
-    address: z.string().min(5, {
-      message: "La dirección debe tener al menos 5 caracteres.",
-    }),
+    phone: z
+      .string()
+      .regex(/^\+?[0-9]{9,15}$/, { message: "Número de teléfono inválido." }),
+    address: z
+      .string()
+      .min(5, { message: "La dirección debe tener al menos 5 caracteres." }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -51,16 +49,30 @@ const formSchema = z
   });
 
 export default function PerfilPage() {
-  const [profileImage, setProfileImage] = useState("/images/perfil.avif");
+  const userData = getUserData();
+
+  // Extraer los datos del usuario autenticado
+  const userFirstName = userData?.info_usuario?.nombre || "";
+  const userSecondName = userData?.info_usuario?.nombre2 || "";
+  const userLastName = userData?.info_usuario?.apellidoP || "";
+  const userSecondLastName = userData?.info_usuario?.apellidoM || "";
+  const userEmail = userData?.email || "";
+  const userPhone = userData?.info_usuario?.telefono || "";
+  const userAddress = userData?.info_usuario?.direccion || "";
+  const userImage = userData?.info_usuario?.image_url || "/images/perfil.avif";
+
+  const [profileImage, setProfileImage] = useState(userImage);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "Deyvi",
-      lastName: "Villegas",
-      email: "1452700120@unitru.edu.pe",
-      phone: "+51908546758",
-      address: "Av. Juan Pablo II s/n - Ciudad Universitaria, Trujillo",
+      firstName: `${userFirstName} ${userSecondName}`.trim(),
+      lastName: `${userLastName} ${userSecondLastName}`.trim(),
+      email: userEmail,
+      phone: userPhone,
+      address: userAddress,
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -101,7 +113,10 @@ export default function PerfilPage() {
             <div className="flex items-center space-x-4">
               <Avatar className="w-24 h-24">
                 <AvatarImage src={profileImage} />
-                <AvatarFallback>DV</AvatarFallback>
+                <AvatarFallback>
+                  {userFirstName[0]}
+                  {userLastName[0]}
+                </AvatarFallback>
               </Avatar>
               <div>
                 <FormField
