@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import api from "@/utils/axios";
+import { useToast } from "@/hooks/use-toast";
 
 interface Category {
   id: number;
@@ -26,17 +27,22 @@ interface Condition {
 interface AddTeacherModalProps {
   open: boolean;
   onClose: () => void;
+  onTeacherCreated?: () => void;
 }
 
-const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
+const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
+  open,
+  onClose,
+  onTeacherCreated,
+}) => {
   const [animate, setAnimate] = useState(false);
 
   const [nombres, setNombres] = useState("");
   const [apellidos, setApellidos] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [condicion, setCondicion] = useState("");
+  const [categoriaID, setCategoriaID] = useState<string>("");
+  const [condicionID, setCondicionID] = useState<string>("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [profileImage, setProfileImage] = useState<File | null>(null);
@@ -45,6 +51,8 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
 
   const [categorias, setCategorias] = useState<Category[]>([]);
   const [condiciones, setCondiciones] = useState<Condition[]>([]);
+
+  const { toast } = useToast();
 
   useEffect(() => {
     setAnimate(true);
@@ -58,7 +66,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
         );
         setCategorias(response.data);
         if (response.data.length > 0) {
-          setCategoria(response.data[0].nombre);
+          setCategoriaID(String(response.data[0].id));
         }
       } catch (error) {
         console.error("Error al obtener categorías:", error);
@@ -72,7 +80,7 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
         );
         setCondiciones(response.data);
         if (response.data.length > 0) {
-          setCondicion(response.data[0].nombre);
+          setCondicionID(String(response.data[0].id));
         }
       } catch (error) {
         console.error("Error al obtener condiciones:", error);
@@ -98,23 +106,48 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const newTeacher = {
-      nombres,
-      apellidos,
-      telefono,
-      direccion,
-      categoria,
-      condicion,
-      email,
-      password,
-    };
+    try {
+      const formData = new FormData();
+      formData.append("nombres", nombres);
+      formData.append("apellidos", apellidos);
+      formData.append("email", email);
+      formData.append("password", password);
+      formData.append("telefono", telefono);
+      formData.append("direccion", direccion);
+      formData.append("rolusuario", "2");
+      formData.append("categoriaDocente", categoriaID);
+      formData.append("condicion", condicionID);
 
-    console.log("Nuevo docente:", newTeacher);
+      if (profileImage) {
+        formData.append("image", profileImage);
+      }
 
-    setTimeout(() => {
-      setIsLoading(false);
+      const response = await api.post(
+        "/api/auth/Docentes/crearDocente",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      console.log("Docente creado:", response.data);
+
+      toast({
+        description: "Docente creado correctamente.",
+      });
+
+      onTeacherCreated?.();
+
       onClose();
-    }, 1500);
+    } catch (error) {
+      console.error("Error al crear docente:", error);
+      toast({
+        description: "Error al crear docente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -227,13 +260,17 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
               <label className="block font-normal text-sm mb-1">
                 Categoría docente
               </label>
-              <Select value={categoria} onValueChange={setCategoria} required>
+              <Select
+                value={categoriaID}
+                onValueChange={setCategoriaID}
+                required
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona categoría" />
                 </SelectTrigger>
                 <SelectContent>
                   {categorias.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.nombre}>
+                    <SelectItem key={cat.id} value={String(cat.id)}>
                       {cat.nombre}
                     </SelectItem>
                   ))}
@@ -244,13 +281,17 @@ const AddTeacherModal: React.FC<AddTeacherModalProps> = ({ open, onClose }) => {
               <label className="block font-normal text-sm mb-1">
                 Condición
               </label>
-              <Select value={condicion} onValueChange={setCondicion} required>
+              <Select
+                value={condicionID}
+                onValueChange={setCondicionID}
+                required
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecciona condición" />
                 </SelectTrigger>
                 <SelectContent>
                   {condiciones.map((cond) => (
-                    <SelectItem key={cond.id} value={cond.nombre}>
+                    <SelectItem key={cond.id} value={String(cond.id)}>
                       {cond.nombre}
                     </SelectItem>
                   ))}

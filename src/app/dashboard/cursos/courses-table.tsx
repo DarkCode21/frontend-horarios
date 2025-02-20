@@ -30,6 +30,7 @@ interface Course {
   ciclo_nombre: string;
   creditos: number;
   modalidades: string[];
+  fecha: string[];
 }
 
 interface CoursesResponse {
@@ -49,6 +50,15 @@ export function CoursesTable() {
   const [perPage, setPerPage] = useState<number>(6);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [lastPage, setLastPage] = useState<number>(1);
+
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   const fetchCourses = async (page: number, limit: number) => {
     setLoading(true);
@@ -144,7 +154,11 @@ export function CoursesTable() {
                   Activo
                 </Badge>
               </TableCell>
-              <TableCell>N/A</TableCell>
+              <TableCell>
+                {course.fecha.map((date, index) => (
+                  <span key={index}>{formatDate(date)}</span>
+                ))}
+              </TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

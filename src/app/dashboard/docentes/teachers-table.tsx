@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MoreHorizontal } from "lucide-react";
-
 import {
   Table,
   TableBody,
@@ -13,17 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
-import api from "@/utils/axios";
 import Loader from "@/components/loader";
+import api from "@/utils/axios";
+import ActionsDropdown from "@/components/Vista-docente/ActionsDropdown-docente";
+import ViewTeacherModal from "@/components/Vista-docente/ViewTeacherModal";
+import EditTeacherModal from "@/components/Vista-docente/EditTeacherModal";
 
 interface Docente {
   id: number;
@@ -44,16 +37,26 @@ interface DocentesResponse {
   total: number;
 }
 
-export function TeachersTable() {
+interface TeachersTableProps {
+  reload?: boolean;
+}
+
+export function TeachersTable({ reload }: TeachersTableProps) {
   const [docentes, setDocentes] = useState<Docente[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
+  // Paginación
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<number>(6);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [lastPage, setLastPage] = useState<number>(1);
 
+  // Estado para manejar modales
+  const [viewTeacherId, setViewTeacherId] = useState<number | null>(null);
+  const [editTeacherId, setEditTeacherId] = useState<number | null>(null);
+
+  // Carga de docentes
   const fetchDocentes = async (page: number, limit: number) => {
     setLoading(true);
     setError("");
@@ -77,7 +80,15 @@ export function TeachersTable() {
 
   useEffect(() => {
     fetchDocentes(currentPage, perPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (reload) {
+      fetchDocentes(currentPage, perPage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reload]);
 
   const goToPage = (pageNumber: number) => {
     if (pageNumber < 1 || pageNumber > lastPage) return;
@@ -89,9 +100,7 @@ export function TeachersTable() {
     fetchDocentes(1, newPerPage);
   };
 
-  const getFullName = (doc: Docente) => {
-    return `${doc.nombre} ${doc.apellidoP}`;
-  };
+  const getFullName = (doc: Docente) => `${doc.nombre} ${doc.apellidoP}`;
 
   if (loading) {
     return (
@@ -100,9 +109,16 @@ export function TeachersTable() {
       </div>
     );
   }
+
   if (error) {
     return <div className="p-4 text-red-600">{error}</div>;
   }
+
+  // Callback para refrescar la tabla (si se actualiza un docente)
+  const handleTeacherUpdated = () => {
+    // Por ejemplo, recargar en la misma página actual
+    fetchDocentes(currentPage, perPage);
+  };
 
   return (
     <div>
@@ -142,29 +158,18 @@ export function TeachersTable() {
               <TableCell>{teacher.condicion}</TableCell>
               <TableCell>{teacher.total_cursos}</TableCell>
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Abrir menú</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Ver detalles</DropdownMenuItem>
-                    <DropdownMenuItem>Editar docente</DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      Eliminar docente
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <ActionsDropdown
+                  onViewDetails={() => setViewTeacherId(teacher.id)}
+                  onEdit={() => setEditTeacherId(teacher.id)}
+                  onDelete={() => alert("Eliminar: " + teacher.email)}
+                />
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
+      {/* Pagina */}
       <div className="flex items-center justify-between px-4 py-4 border-t">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           Mostrando {docentes.length} de {totalItems}
@@ -219,6 +224,23 @@ export function TeachersTable() {
           </Button>
         </div>
       </div>
+
+      {/* Modal de Ver Detalles */}
+      {viewTeacherId && (
+        <ViewTeacherModal
+          docenteId={viewTeacherId}
+          onClose={() => setViewTeacherId(null)}
+        />
+      )}
+
+      {/* Modal de Editar */}
+      {editTeacherId && (
+        <EditTeacherModal
+          docenteId={editTeacherId}
+          onClose={() => setEditTeacherId(null)}
+          onTeacherUpdated={handleTeacherUpdated}
+        />
+      )}
     </div>
   );
 }

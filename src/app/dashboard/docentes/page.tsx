@@ -6,10 +6,17 @@ import { TeachersTable } from "./teachers-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import AddTeacherModal from "@/components/AddTeacherModal";
+import AddTeacherModal from "@/components/Vista-docente/AddTeacherModal";
 
 export default function DocentesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [reload, setReload] = useState(false);
+
+  const handleTeacherCreated = () => {
+    setReload((prev) => !prev);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="space-y-8 p-8 pt-6">
@@ -32,13 +39,15 @@ export default function DocentesPage() {
           </Button>
           <Input placeholder="Buscar docente..." className="w-[300px]" />
         </div>
-        <TeachersTable />
+
+        <TeachersTable reload={reload} />
       </Card>
 
       {/* Modal */}
       <AddTeacherModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onTeacherCreated={handleTeacherCreated}
       />
     </div>
   );

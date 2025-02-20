@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 import {
   FiUser,
   FiSettings,
@@ -12,37 +11,44 @@ import {
   FiMonitor,
 } from "react-icons/fi";
 import { MoreHorizontal } from "lucide-react";
-
 import api from "@/utils/axios";
+import { useRouter } from "next/navigation";
 
 type ThemeOption = "system" | "light" | "dark";
 
 export default function MoreDropdown() {
   const router = useRouter();
-
-  const [theme, setTheme] = useState<ThemeOption>(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme") as ThemeOption | null;
-      if (savedTheme) return savedTheme;
-
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    return "light";
-  });
-
+  const [theme, setTheme] = useState<ThemeOption>("light");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const toggleThemeDropdown = () => setThemeDropdownOpen((prev) => !prev);
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+        setThemeDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const handleThemeChange = (newTheme: ThemeOption) => {
-    setTheme(newTheme);
-    setThemeDropdownOpen(false);
-  };
+  // Leer theme inicial
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme") as ThemeOption | null;
+      if (savedTheme) {
+        setTheme(savedTheme);
+      } else {
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        setTheme(prefersDark ? "dark" : "light");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -59,28 +65,34 @@ export default function MoreDropdown() {
           html.classList.add("dark");
         }
       }
-
       localStorage.setItem("theme", theme);
     }
   }, [theme]);
 
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+  const toggleThemeDropdown = () => {
+    setThemeDropdownOpen((prev) => !prev);
+  };
+  const handleThemeChange = (newTheme: ThemeOption) => {
+    setTheme(newTheme);
+    setThemeDropdownOpen(false);
+  };
   const handleLogout = async () => {
     try {
       await api.post("/api/auth/logout");
-
       localStorage.removeItem("token");
-
       router.push("/auth/login");
     } catch (error) {
       console.error("Error al hacer logout:", error);
-
       localStorage.removeItem("token");
       router.push("/auth/login");
     }
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={ref}>
       <button
         onClick={toggleDropdown}
         className="h-8 w-8 flex items-center justify-center"
@@ -200,7 +212,7 @@ export default function MoreDropdown() {
               className="
                 flex items-center w-full px-4 py-2 text-left text-sm
                 hover:bg-destructive hover:text-destructive-foreground
-                transition
+                transition text-red-600
               "
             >
               <FiLogOut className="mr-2" />
